@@ -12,11 +12,11 @@
 
         <div class="col-md-4">
             <div class="card text-white bg-info mb-3" style="">
-                <div class="card-header">Most Played Device</div>
+                <div class="card-header">Monthly Income</div>
                 <div class="card-body">
                     <h5 class="card-title">{{
-                    $allSessions->groupBy('game_type')->map->count()->sortDesc()->keys()->first()
-}}</h5>
+                    $allSessions->where('date', '>=', \Carbon\Carbon::now()->startOfMonth())->sum('total_cost')
+    }}</h5>
 
                 </div>
             </div>
@@ -41,7 +41,7 @@ Minutes
                 <div class="card-header">Today Income</div>
                 <div class="card-body">
                     <h5 class="card-title">{{
-                    $allSessions->where('created_at', '>=', \Carbon\Carbon::today())->sum('total_cost')
+                    $allSessions->where('date', '>=', \Carbon\Carbon::today())->sum('total_cost')
  }} IQD</h5>
 
                 </div>

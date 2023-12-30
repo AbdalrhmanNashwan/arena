@@ -6,7 +6,7 @@
     <link rel="stylesheet" href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' >
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Form Using HTML And CSS Only</title>
+    <title>Login</title>
 </head>
 <body class="body-login" style="background-image: url('https://wallpapercave.com/wp/wp11726455.jpg')">
 <div class="container" id="container">

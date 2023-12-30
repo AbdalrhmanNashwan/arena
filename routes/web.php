@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CustomAuth;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\Settings;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GsessionsController;
@@ -31,7 +33,9 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::get('/expenses',[ExpenseController::class,'show'] )->name('expenses');
     Route::get('/debts',[DebtController::class,'show'] )->name('debts');
     Route::get('/sessions',[GsessionsController::class,'allSessions'] )->name('sessions');
-    Route::get('/settings',[ExpenseController::class,'show'] )->name('settings');}
+    Route::get('/settings',[Settings::class,'show'] )->name('settings');
+    Route::post('/CustomRegister',[CustomAuth::class,'create'] )->name('CustomRegister');
+}
 );
 
 ////create route for login.blade.php from auth controller with two parameter
