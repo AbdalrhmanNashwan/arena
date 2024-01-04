@@ -15,7 +15,7 @@
                 <div class="card-header">Monthly Income</div>
                 <div class="card-body">
                     <h5 class="card-title">{{
-                    $allSessions->where('date', '>=', \Carbon\Carbon::now()->startOfMonth())->sum('total_cost')
+    $monthSessions->sum('total_cost')
     }}</h5>
 
                 </div>
@@ -30,7 +30,7 @@
                     //show average playing minutes with one decimal
                     number_format($allSessions->avg('minutes_played'), 1)
 }}
-Minutes
+                        Minutes
                     </h5>
 
                 </div>
@@ -41,7 +41,7 @@ Minutes
                 <div class="card-header">Today Income</div>
                 <div class="card-body">
                     <h5 class="card-title">{{
-                    $allSessions->where('date', '>=', \Carbon\Carbon::today())->sum('total_cost')
+    $todaySessions->sum('total_cost')
  }} IQD</h5>
 
                 </div>
@@ -88,7 +88,9 @@ Minutes
             </tbody>
         </table>
         <div class="">
-            {{ $sessions->links() }}
+            {{
+     $sessions->links()
+      }}
         </div>
 
     </div>

@@ -91,7 +91,7 @@
             <span class="tooltip">Settings</span>
         </li>
     </ul>
-    <div class="content">
+    <div class="content " >
         <div class="user">
             <div class="user_details">
                 <div class="name_job">
@@ -105,7 +105,6 @@
                 <button type="submit" class="btn btn-danger" style="background-color:#1a202c;border-color: #1a202c">
                     <i class='bx bx-log-out' style="color: #AEFF00"></i>
                 </button>
-
             </form>
         </div>
     </div>

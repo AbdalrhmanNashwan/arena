@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomAuth;
+use App\Http\Controllers\dashBoardController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\Settings;
@@ -29,7 +30,7 @@ Route::get('/', function () {
 });
 
 Route::group(['middleware' => ['auth:web']], function () {
-    Route::get('/home',[    GsessionsController::class,'show'] )->name('home');
+    Route::get('/home',[   dashBoardController::class,'show'] )->name('home');
     Route::get('/expenses',[ExpenseController::class,'show'] )->name('expenses');
     Route::get('/debts',[DebtController::class,'show'] )->name('debts');
     Route::get('/sessions',[GsessionsController::class,'allSessions'] )->name('sessions');

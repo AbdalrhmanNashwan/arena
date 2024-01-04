@@ -43,12 +43,7 @@ class GsessionsController extends Controller
 
     public function show()
     {
-        //return session by paginate
-        $sessionsDevices = Gsessions::paginate(20);
-        $itemNames = Gsessions::all();
-        $itemQuantities = Gsessions::all();
 
-        return view('home', compact('sessionsDevices', 'itemNames', 'itemQuantities'));
     }
     public function update(Request $request, $noteId)
     {}
@@ -58,7 +53,11 @@ public function allSessions(){
 //return all sessions by paginate
     $sessions = Gsessions::paginate(20);
     $allSessions = Gsessions::all();
-    return view('sessions', compact('sessions', 'allSessions'));
+    //return sessions by today
+    $todaySessions = Gsessions::where('date', '>=', now()->subDays(1))->get();
+    //return sessions by month
+    $monthSessions = Gsessions::where('date', '>=', now()->subDays(30))->get();
+    return view('sessions', compact('sessions', 'allSessions', 'todaySessions', 'monthSessions'));
 }
 
 

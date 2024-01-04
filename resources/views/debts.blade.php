@@ -55,9 +55,13 @@
             @endforeach
             </tbody>
         </table>
-        <div class="">
-            {{ $debts->links() }}
+        <div class="pagination justify-content-center ">
+            {{
+        $debts->links()
+
+      }}
         </div>
+
 
     </div>
 

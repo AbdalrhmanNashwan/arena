@@ -514,3 +514,8 @@ display: none !important;
     color: #30312C !important;
     margin-right: 15px ;
 }
+/* Custom CSS for pagination buttons */
+.custom-pagination .pagination li .page-link {
+    border-radius: 50px; /* Adjust the value for the desired button shape (e.g., rounded) */
+    /* Add other styling properties as needed */
+}

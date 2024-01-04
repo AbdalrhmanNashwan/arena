@@ -12,11 +12,14 @@
                         <!-- JavaScript for Chart.js (Item Quantities Chart) -->
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                         <script>
-                            // Get the data passed from the controller
-                            var itemNames = @json($itemNames);
-                            var itemQuantities = @json($itemQuantities);
+                            var itemDataCollection = @json($itemDataCollection);
 
-                            // Create a stunning chart (e.g., pie chart) to display item quantities
+                            // Extract the item names and quantities
+                            var itemNames = Object.keys(itemDataCollection);
+                            var itemQuantities = Object.values(itemDataCollection);
+                            //sort the items by quantity
+                            console.log(itemNames);
+                            // Create a stunning chart (e.g., bar chart) to display item quantities
                             var ctx = document.getElementById('itemQuantities').getContext('2d');
                             var chart = new Chart(ctx, {
                                 type: 'bar', // You can choose other chart types (e.g., 'bar', 'line', etc.)
@@ -31,22 +34,19 @@
                                             'rgba(75, 192, 192, 0.6)',
                                             'rgba(153, 102, 255, 0.6)',
                                         ],
-                                    },
-
-                                    ]
+                                    }]
                                 },
                                 options: {
                                     maintainAspectRatio: false,
                                     plugins: {
                                         title: {
                                             display: true,
-                                            text: 'Sales of Bar Items',
+                                            text: 'Sales of Bar Items Last 30 Days',
                                         },
                                         legend: {
                                             display: false,
                                         }
                                     }
-
                                     // You can customize chart options here (e.g., title, legend, etc.)
                                 }
                             });
@@ -56,24 +56,30 @@
                         <div id="averageMinutesChart2" style="height: 200px">
                             <canvas id="averageMinutes"></canvas>
                         </div>
-
-                        <!-- JavaScript for Chart.js (Average Minutes Chart) -->
                         <script>
-                            // Get the data passed from the controller
-                            var sessionDevices = @json($sessionsDevices);
+                            var sessiondevices = @json($sessionsDevices);
 
-                            // Extract device numbers and total minutes from the data
-                            var gameTypes = sessionDevices.map(session => session.game_type);
-                            var averageMinutes = sessionDevices.map(session => session.hours_played);
-
-                            // Create a bar chart for average playing minutes
+                            //extract the game types without duplicates
+                            var gameTypes = sessiondevices.map(session => session.game_type);
+                            gameTypes = gameTypes.filter((value, index) => gameTypes.indexOf(value) === index);
+                            //extract the total minutes for each game type
+                            var totalHoursList = [];
+                            for (var i = 0; i < gameTypes.length; i++) {
+                                var totalHours = 0;
+                                for (var j = 0; j < sessiondevices.length; j++) {
+                                    if (sessiondevices[j].game_type === gameTypes[i]) {
+                                        totalHours += sessiondevices[j].minutes_played/60;
+                                    }
+                                }
+                                totalHoursList.push(totalHours.toFixed(2));
+                            }
                             var ctx2 = document.getElementById('averageMinutes').getContext('2d');
                             var chart2 = new Chart(ctx2, {
                                 type: 'pie',
                                 data: {
                                     labels: gameTypes,
                                     datasets: [{
-                                        data: averageMinutes,
+                                        data: totalHoursList,
                                         backgroundColor: [
                                             'rgba(255, 99, 132, 0.6)',
                                             'rgba(54, 162, 235, 0.6)',
@@ -104,11 +110,31 @@
 
                         <!-- JavaScript for Chart.js (Average Minutes Chart) -->
                         <script>
-                            // Get the data passed from the controller
-                            var itemNames = @json($itemNames);
-                            var itemQuantities = @json($itemQuantities);
+                            //get the monthly expenses
+                            var monthlyexpenses = @json($monthlyExpenses);
+                            //first make a list of unique dates
+                            var date = [];
+                            //sort the expenses by date
+                            monthlyexpenses.sort(function (a, b) {
+                                return new Date(a.created_at) - new Date(b.created_at);
+                            });
+                            for (var i = 0; i < monthlyexpenses.length; i++) {
+                                //slice the date to get the month and day only
+                                date.push(monthlyexpenses[i].created_at.slice(8, 10));
+                            }
+                            date = date.filter((value, index) => date.indexOf(value) === index);
 
-                            // Create a stunning chart (e.g., pie chart) to display item quantities
+                            //then make a list of total expenses for each date
+                            var total = [];
+                            for (var i = 0; i < date.length; i++) {
+                                var totalCost = 0;
+                                for (var j = 0; j < monthlyexpenses.length; j++) {
+                                    if (monthlyexpenses[j].created_at.slice(8, 10) === date[i]) {
+                                        totalCost += monthlyexpenses[j].amount;
+                                    }
+                                }
+                                total.push(totalCost);
+                            }
                             var ctx = document.getElementById('itemQuantities2').getContext('2d');
 
                             // Create a bar chart for average playing minutes
@@ -116,12 +142,9 @@
                             var chart2 = new Chart(ctx2, {
                                 type: 'line',
                                 data: {
-                                    labels:  ['1','2','3','4','5','6','7','8','9','10','11','12'
-                                        ,'13','14','15','16','17','18','19','20','21','22','23','24','25','26','27',
-                                        '28','29','30','31'
-                                    ],
+                                    labels:  date,
                                     datasets: [{
-                                        data: averageMinutes,
+                                        data: total,
                                         backgroundColor: [
                                             //suggest colors
                                             'rgba(255, 99, 132, 0.6)',
@@ -138,7 +161,7 @@
                                     plugins: {
                                         title: {
                                             display: true,
-                                            text: 'Monthly Expenses (IQD)',
+                                            text: 'Expenses Last 30 Days (IQD)',
 
                                         },   legend: {
                                             display: false,
@@ -156,12 +179,12 @@
 
                         <!-- JavaScript for Chart.js (Average Minutes Chart) -->
                         <script>
-                            // Get the data passed from the controller
-                            var sessionDevices = @json($sessionsDevices);
+
+                            var totalCostCollection = @json($totalCostCollection);
 
                             // Extract device numbers and total minutes from the data
-                            var gameTypes = sessionDevices.map(session => session.game_type);
-                            var averageMinutes = sessionDevices.map(session => session.hours_played);
+                            var gameTypes = Object.keys(totalCostCollection);
+                            var totalCost = Object.values(totalCostCollection);
 
                             // Create a bar chart for average playing minutes
                             var ctx2 = document.getElementById('averageMinutes2').getContext('2d');
@@ -171,7 +194,7 @@
                                     labels: gameTypes,
                                     datasets: [
                                         {
-                                            data: averageMinutes,
+                                            data: totalCost,
                                             backgroundColor: [
                                                 //suggest colors
                                                 'rgba(255, 159, 64, 0.6)' ,
@@ -191,7 +214,7 @@
                                     plugins: {
                                         title: {
                                             display: true,
-                                            text: 'Profit per Device (IQD)',
+                                            text: 'Total Cost Last 30 Day (IQD)',
 
                                         },
 
@@ -207,19 +230,39 @@
 
                         <!-- JavaScript for Chart.js (Average Minutes Chart) -->
                         <script>
-                            // Get the data passed from the controller
-                            var itemNames = @json($itemNames);
-                            var itemQuantities = @json($itemQuantities);
+                            var monthlyDebts = @json($monthlyDebts);
+                            //first make a list of unique dates
+                            var date = [];
+                            //sort the expenses by date
+                            monthlyDebts.sort(function (a, b) {
+                                return new Date(a.created_at) - new Date(b.created_at);
+                            });
+                            for (var i = 0; i < monthlyDebts.length; i++) {
+                                //slice the date to get the month and day only
+                                date.push(monthlyDebts[i].created_at.slice(8, 10));
+                            }
+                            date = date.filter((value, index) => date.indexOf(value) === index);
 
+                            //then make a list of total expenses for each date
+                            var total = [];
+                            for (var i = 0; i < date.length; i++) {
+                                var totalCost = 0;
+                                for (var j = 0; j < monthlyDebts.length; j++) {
+                                    if (monthlyDebts[j].created_at.slice(8, 10) === date[i]) {
+                                        totalCost += monthlyDebts[j].amount;
+                                    }
+                                }
+                                total.push(totalCost);
+                            }
 
                             // Create a bar chart for average playing minutes
                             var ctx2 = document.getElementById('itemQuantities3').getContext('2d');
                             var chart2 = new Chart(ctx2, {
                                 type: 'line',
                                 data: {
-                                    labels: ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'],
+                                    labels: date,
                                     datasets: [{
-                                        data: averageMinutes,
+                                        data: total,
                                         backgroundColor: [
                                             //suggest colors
                                             'rgba(255, 99, 132, 0.6)',
@@ -236,7 +279,7 @@
                                     plugins: {
                                         title: {
                                             display: true,
-                                            text: 'Yearly Profits (IQD)',
+                                            text: 'Debts Last 30 Days (IQD)',
 
                                         },
                                         legend: {
@@ -255,12 +298,6 @@
 
                         <!-- JavaScript for Chart.js (Average Minutes Chart) -->
                         <script>
-                            // Get the data passed from the controller
-                            var sessionDevices = @json($sessionsDevices);
-
-                            // Extract device numbers and total minutes from the data
-                            var gameTypes = sessionDevices.map(session => session.game_type);
-                            var averageMinutes = sessionDevices.map(session => session.hours_played);
 
                             // Create a bar chart for average playing minutes
                             var ctx2 = document.getElementById('averageMinutes4').getContext('2d');
@@ -269,7 +306,7 @@
                                 data: {
                                     labels: gameTypes,
                                     datasets: [{
-                                        data: averageMinutes,
+                                        data: totalCost,
                                         backgroundColor: [
                                             //suggest colors
                                             'rgba(255, 99, 132, 0.6)',
@@ -286,7 +323,7 @@
                                     plugins: {
                                         title: {
                                             display: true,
-                                            text: 'Expenses (IQD)',
+                                            text: 'Today Cost (IQD)',
 
                                         },legend: {
                                             display: false,
