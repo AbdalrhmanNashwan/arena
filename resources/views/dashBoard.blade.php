@@ -45,7 +45,7 @@
             <span class="tooltip">Expenses</span>
         </li>
         <li class="{{request()->segment(1) == 'income' ? 'active-tooltip' : ''}}">
-            <a href="#">
+            <a href="{{route('income')}}">
                 <i class='bx bx-dollar' style="{{
                     request()->segment(1) == 'income' ? 'color: #11101d' : ''
                 }}"></i>
@@ -114,6 +114,8 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="jquery-3.7.1.min.js"></script>
+
 <script>
     let btn = document.querySelector("#btn");
     let sidebar = document.querySelector(".sidebar");

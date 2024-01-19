@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->integer('amount');
             $table->text('reason');
+            $table->dateTime('date');
+            $table->boolean('paid')->default(false);
+            $table->dateTime('paid_date')->nullable();
             $table->timestamps();
         });
     }

@@ -17,15 +17,16 @@ return new class extends Migration
             $table->integer('device_number');
             $table->integer('minutes_played')  ;
             $table->integer('room_cost')    ;
-            $table->string('bar_items')    ;
+            $table->text('bar_items')   ->nullable() ;
             $table->integer('bar_cost' )   ;
             $table->integer('cost')   ;
             $table->string('total_cost' )   ;
             $table->string('promo_percent') ;
-            $table->string('cost_after_promo');
+            $table->integer('cost_after_promo');
             $table->integer('group');
             $table->string('card')->nullable();
             $table->string('card_type')->nullable();
+            $table->text('note')->nullable();
             $table->dateTime('date');
             $table->timestamps();
         });

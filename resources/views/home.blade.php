@@ -116,11 +116,11 @@
                             var date = [];
                             //sort the expenses by date
                             monthlyexpenses.sort(function (a, b) {
-                                return new Date(a.created_at) - new Date(b.created_at);
+                                return new Date(a.date) - new Date(b.date);
                             });
                             for (var i = 0; i < monthlyexpenses.length; i++) {
                                 //slice the date to get the month and day only
-                                date.push(monthlyexpenses[i].created_at.slice(8, 10));
+                                date.push(monthlyexpenses[i].date.slice(8, 10));
                             }
                             date = date.filter((value, index) => date.indexOf(value) === index);
 
@@ -129,7 +129,7 @@
                             for (var i = 0; i < date.length; i++) {
                                 var totalCost = 0;
                                 for (var j = 0; j < monthlyexpenses.length; j++) {
-                                    if (monthlyexpenses[j].created_at.slice(8, 10) === date[i]) {
+                                    if (monthlyexpenses[j].date.slice(8, 10) === date[i]) {
                                         totalCost += monthlyexpenses[j].amount;
                                     }
                                 }
@@ -235,11 +235,11 @@
                             var date = [];
                             //sort the expenses by date
                             monthlyDebts.sort(function (a, b) {
-                                return new Date(a.created_at) - new Date(b.created_at);
+                                return new Date(a.date) - new Date(b.date);
                             });
                             for (var i = 0; i < monthlyDebts.length; i++) {
                                 //slice the date to get the month and day only
-                                date.push(monthlyDebts[i].created_at.slice(8, 10));
+                                date.push(monthlyDebts[i].date.slice(8, 10));
                             }
                             date = date.filter((value, index) => date.indexOf(value) === index);
 
@@ -248,7 +248,7 @@
                             for (var i = 0; i < date.length; i++) {
                                 var totalCost = 0;
                                 for (var j = 0; j < monthlyDebts.length; j++) {
-                                    if (monthlyDebts[j].created_at.slice(8, 10) === date[i]) {
+                                    if (monthlyDebts[j].date.slice(8, 10) === date[i]) {
                                         totalCost += monthlyDebts[j].amount;
                                     }
                                 }

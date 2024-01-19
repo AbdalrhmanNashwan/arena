@@ -41,8 +41,8 @@ class dashBoardController extends Controller
         // Return all sessions without paginate for the last 30 days
         $sessionsDevices = Gsessions::where('date', '>=', now()->subDays(30))->get();
         // Return monthly expenses for the last 30 days
-        $monthlyExpenses = Expense::where('created_at', '>=', now()->subDays(30))->get();
-        $monthlyDebts = Debt::where('created_at', '>=', now()->subDays(30))->get();
+        $monthlyExpenses = Expense::where('date', '>=', now()->subDays(30))->get();
+        $monthlyDebts = Debt::where('date', '>=', now()->subDays(30))->get();
 
         $itemData = [];
         foreach ($sessionsDevices as $session) {

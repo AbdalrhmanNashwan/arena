@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('amount');
             $table->string('category');
             $table->text('notes');
+            $table->dateTime('date');
             $table->timestamps();
         });
     }

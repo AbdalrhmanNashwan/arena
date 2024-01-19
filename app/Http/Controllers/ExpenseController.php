@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Debt;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -54,6 +55,27 @@ class ExpenseController extends Controller
             //return success message with the saved expense
             return response()->json(['message' => 'Expense created successfully', 'expenses' => $expenses], 201);
     }
+    //create a function to store expense from web
+    public function storeExpense(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'amount' => 'required|numeric',
+            'category' => 'required|string',
+            'notes' => 'required|string',
+        ]);
+
+        // Create a new debt
+        Expense::create([
+            'name' => $request->input('name'),
+            'amount' => $request->input('amount'),
+            'category' => $request->input('category'),
+            'notes' => $request->input('notes'),
+            'date' => now(),
+        ]);
+
+        return back()->with('success', 'Expense created successfully.');
+    }
 
     /**
      * Display the specified resource.
@@ -62,6 +84,8 @@ class ExpenseController extends Controller
     {
         //get all expense records
         $expenses = Expense::latest()->paginate(20);
+        //sort expenses by date
+        $expenses = Expense::orderBy('date', 'desc')->paginate(20);
         $allExpenses = Expense::all();
         //return expense view with the records
         return view('expense', ['expenses' => $expenses, 'allExpenses' => $allExpenses]);
@@ -82,12 +106,35 @@ class ExpenseController extends Controller
     {
         //
     }
+    public function updateAmount(Request $request, string $id)
+    {
+        //validate the request
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required|integer',
+        ]);
+        //if validation fails return error message
+        if ($validator->fails()) {
+            return back()->with('error', 'Validation failed');
+        }
+        //find the expense
+        $expense = Expense::findOrFail($id);
+        //update the expense amount
+        $expense->amount = $request->amount;
+        //save the expense
+        $expense->save();
+        //return success message
+        return back()->with('success', 'Expense updated successfully.');
+    }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        //
+        //delete expense
+        $expense = Expense::findOrFail($id);
+        $expense->delete();
+        //return success message
+        return back()->with('success', 'Expense deleted successfully.');
     }
 }
