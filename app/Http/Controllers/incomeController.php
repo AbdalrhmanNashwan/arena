@@ -39,7 +39,8 @@ class incomeController extends Controller
      */
     public function show()
     {
-        $allSessions = Gsessions::all();
+        $allSessions1 = Gsessions::all();
+        $allSessions2 = Gsessions::all();
         $allDebts = Debt::all();
         $allExpenses = Expense::all();
 
@@ -69,12 +70,16 @@ class incomeController extends Controller
         $yearlyDebtsList = [];
         $yearlyExpensesList = [];
         //calculate today income by date only
-        foreach ($allSessions as $session) {
+
+        //remove duplicate date in allSessions
+        $allSessions1 = $allSessions1->unique('date');
+
+        foreach ($allSessions1 as $session) {
             $formattedDate = Carbon::parse($session->date);
             if ($formattedDate->isToday()) {
                 $todayIncome += $session->cost_after_promo;
                 $todayDeviceIncome += ($session->cost_after_promo - $session->bar_cost);
-                $todayBarIncome += $session->bar_cost;
+
 
                 //add session to today sessions list
                 $todaySessionsList[] = $session;
@@ -82,8 +87,8 @@ class incomeController extends Controller
             if ($formattedDate->isCurrentMonth()) {
                 $monthlyIncome += $session->cost_after_promo;
                 $monthlyDeviceIncome += ($session->cost_after_promo - $session->bar_cost);
-                $monthlyBarIncome += $session->bar_cost;
-                $monthlyBarIncome += $session->bar_cost;
+                #todo:fix this
+              //  $monthlyBarIncome += $session->bar_cost;
                 //add session to monthly sessions list
                 $monthlySessionsList[] = $session;
             }
@@ -92,7 +97,16 @@ class incomeController extends Controller
                 $yearlySessionsList[] = $session;
             }
         }
+        foreach ($allSessions2 as $session) {
+            $formattedDate = Carbon::parse($session->date);
+            if ($formattedDate->isToday()) {
+                $todayBarIncome += $session->bar_cost;
+            }
+            if ($formattedDate->isCurrentMonth()) {
+                $monthlyBarIncome += $session->bar_cost;
+            }
 
+        }
         //calculate today debt by date only
         foreach ($allDebts as $debt) {
             $formattedDate = Carbon::parse($debt->date);
@@ -139,7 +153,7 @@ class incomeController extends Controller
         $monthlyNetIncomeDevice = $monthlyIncome - $monthlydebt - $monthlyExpense;
 
 
-        return view('income', compact('allSessions','todayNetIncome','monthlyNetIncomeDevice', 'todayIncome', 'monthlyIncome', 'todayDeviceIncome', 'monthlyDeviceIncome','todayDeviceIncome', 'todayBarIncome', 'monthlyBarIncome', 'todayNetIncomeDevice', 'monthlyNetIncome', 'todaydebt', 'monthlydebt', 'todayExpense', 'monthlyExpense', 'yearlySessionsList', 'yearlyDebtsList', 'yearlyExpensesList', 'monthlySessionsList', 'monthlyDebtsList', 'monthlyExpensesList'));
+        return view('income', compact('allSessions1','allSessions2','todayNetIncome','monthlyNetIncomeDevice', 'todayIncome', 'monthlyIncome', 'todayDeviceIncome', 'monthlyDeviceIncome','todayDeviceIncome', 'todayBarIncome', 'monthlyBarIncome', 'todayNetIncomeDevice', 'monthlyNetIncome', 'todaydebt', 'monthlydebt', 'todayExpense', 'monthlyExpense', 'yearlySessionsList', 'yearlyDebtsList', 'yearlyExpensesList', 'monthlySessionsList', 'monthlyDebtsList', 'monthlyExpensesList'));
     }
 
     /**
