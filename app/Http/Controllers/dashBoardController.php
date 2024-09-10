@@ -38,30 +38,30 @@ class dashBoardController extends Controller
      */
     public function show()
     {
-        // Return all sessions without paginate for the last 30 days
-        $sessionsDevices = Gsessions::where('date', '>=', now()->subDays(30))->get();
-        // Return monthly expenses for the last 30 days
-        $monthlyExpenses = Expense::where('date', '>=', now()->subDays(30))->get();
-        $monthlyDebts = Debt::where('date', '>=', now()->subDays(30))->get();
+        // Get the current month and year
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
 
-        $itemData = [];
-        foreach ($sessionsDevices as $session) {
-            $barItemsString = $session->bar_items;
-            $items = explode('-', $barItemsString);
-            foreach ($items as $item) {
-                $itemParts = explode(' ', trim($item));
-                if (count($itemParts) === 2) {
-                    $quantity = intval($itemParts[0]);
-                    $itemName = $itemParts[1];
-                    $itemData[$itemName] = isset($itemData[$itemName])
-                        ? $itemData[$itemName] + $quantity
-                        : $quantity;
-                }
-            }
-        }
-        arsort($itemData);
-        $itemDataCollection = collect($itemData);
-        //return the total cost for every game type
+        // Return all sessions for the current month and year
+        $sessionsDevices = Gsessions::whereMonth('date', $currentMonth)
+            ->whereYear('date', $currentYear)
+            ->get();
+
+        $uniqueDates = $sessionsDevices->unique('date');
+
+
+        // Return monthly expenses for the current month and year
+        $monthlyExpenses = Expense::whereMonth('date', $currentMonth)
+            ->whereYear('date', $currentYear)
+            ->get();
+
+        // Return monthly debts for the current month and year
+        $monthlyDebts = Debt::whereMonth('date', $currentMonth)
+            ->whereYear('date', $currentYear)
+            ->get();
+
+
+        // Return the total cost for every game type for the current month
         $totalCost = [];
         foreach ($sessionsDevices as $session) {
             $totalCost[$session->game_type] = isset($totalCost[$session->game_type])
@@ -71,7 +71,12 @@ class dashBoardController extends Controller
         arsort($totalCost);
         $totalCostCollection = collect($totalCost);
 
-        return view('home', compact('sessionsDevices', 'monthlyExpenses', 'itemDataCollection', 'monthlyDebts', 'totalCostCollection'));
+        $currentMonthIncome = $uniqueDates->sum('cost_after_promo');
+        $currentMonthDebts = $monthlyDebts->sum('amount');
+        $currentMonthExpenses = $monthlyExpenses->sum('amount');
+        $currentMonthNet = $currentMonthIncome - $currentMonthDebts - $currentMonthExpenses;
+
+        return view('home', compact('sessionsDevices', 'monthlyExpenses',  'monthlyDebts', 'totalCostCollection', 'currentMonthIncome', 'currentMonthDebts', 'currentMonthExpenses', 'currentMonthNet'));
     }
 
     /**

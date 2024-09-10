@@ -64,6 +64,7 @@
             <th>Bar Cost</th>
             <th>Total Cost</th>
             <th>Promo</th>
+            <th>Code</th>
             <th>New Cost</th>
             <th>Group</th>
             <th>Card</th>
@@ -82,6 +83,7 @@
                     <td>{{$session->bar_cost}}</td>
                     <td>{{$session->total_cost}}</td>
                     <td>{{$session->promo_percent}}</td>
+                    <td>{{$session->code}}</td>
                     <td>{{$session->cost_after_promo}}</td>
                     <td>{{$session->group}}</td>
                     <td>{{$session->card}}</td>

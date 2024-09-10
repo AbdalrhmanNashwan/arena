@@ -40,7 +40,7 @@ class incomeController extends Controller
     public function show()
     {
         $allSessions1 = Gsessions::all();
-        $allSessions2 = Gsessions::all();
+        $allSessions2 = $allSessions1;
         $allDebts = Debt::all();
         $allExpenses = Expense::all();
 

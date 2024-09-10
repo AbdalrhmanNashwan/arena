@@ -21,7 +21,8 @@ return new class extends Migration
             $table->integer('bar_cost' )   ;
             $table->integer('cost')   ;
             $table->string('total_cost' )   ;
-            $table->string('promo_percent') ;
+            $table->string('promo_percent');
+            $table->string('code')->nullable();
             $table->integer('cost_after_promo');
             $table->integer('group');
             $table->string('card')->nullable();
