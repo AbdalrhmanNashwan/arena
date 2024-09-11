@@ -48,12 +48,12 @@ class incomeController extends Controller
         $allSessions = Gsessions::whereBetween('date', [$startDate, $endDate])->get();
         $uniqueSessions = $allSessions->unique('date');
 
-        // Calculate totals
-        $totalPlayingCost = $uniqueSessions->sum(function ($session) {
-            return $session->cost_after_promo - $session->bar_cost; // Playing cost is total minus bar cost
-        });
+
         $totalBarCost = $allSessions->sum('bar_cost');
         $totalIncome = $uniqueSessions->sum('cost_after_promo'); // Total income from unique sessions
+
+        $totalPlayingCost=$totalIncome-$totalBarCost;
+
         $totalDebts = Debt::whereBetween('date', [$startDate, $endDate])->sum('amount');
         $totalExpenses = Expense::whereBetween('date', [$startDate, $endDate])->sum('amount');
 

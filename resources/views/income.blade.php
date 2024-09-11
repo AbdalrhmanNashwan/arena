@@ -36,11 +36,11 @@
                     @php
                         $colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger'];
                         $labels = [
-                            'Playing Cost' => $totalPlayingCost,
-                            'Bar Cost' => $totalBarCost,
+                            'Playing Income' => $totalPlayingCost,
+                            'Bar Income' => $totalBarCost,
                             'Debts' => $totalDebts,
                             'Expenses' => $totalExpenses,
-                            'Net Income' => $totalNetIncome
+                            'Net Income (with Bar Income)' => $totalNetIncome
                         ];
                         $i = 0;
                     @endphp
