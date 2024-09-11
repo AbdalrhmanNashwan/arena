@@ -7,7 +7,7 @@ use App\Models\Expense;
 use App\Models\Gsessions;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Log;
 class incomeController extends Controller
 {
     /**
@@ -37,125 +37,49 @@ class incomeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show()
+
+    public function show(Request $request)
     {
-        $allSessions1 = Gsessions::all();
-        $allSessions2 = $allSessions1;
-        $allDebts = Debt::all();
-        $allExpenses = Expense::all();
+        $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : Carbon::today();
+        $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date'))->endOfDay() : Carbon::today()->endOfDay();
+        $tableToShow = $request->input('table', 'sessions');
 
-        //calculate total income
-        $todayIncome = 0;
-        $monthlyIncome = 0;
+        // Fetch all session data within the range
+        $allSessions = Gsessions::whereBetween('date', [$startDate, $endDate])->get();
+        $uniqueSessions = $allSessions->unique('date');
 
-        $todaydebt = 0;
-        $monthlydebt = 0;
+        // Calculate totals
+        $totalPlayingCost = $uniqueSessions->sum(function ($session) {
+            return $session->cost_after_promo - $session->bar_cost; // Playing cost is total minus bar cost
+        });
+        $totalBarCost = $allSessions->sum('bar_cost');
+        $totalIncome = $uniqueSessions->sum('cost_after_promo'); // Total income from unique sessions
+        $totalDebts = Debt::whereBetween('date', [$startDate, $endDate])->sum('amount');
+        $totalExpenses = Expense::whereBetween('date', [$startDate, $endDate])->sum('amount');
 
-        $todayExpense = 0;
-        $monthlyExpense = 0;
+        // Net Income calculation might need to account for total income rather than playing cost
+        $totalNetIncome = $totalIncome - $totalDebts - $totalExpenses;
 
+        // Fetch and paginate the selected table
+        $itemsQuery = [
+            'sessions' => Gsessions::whereBetween('date', [$startDate, $endDate]),
+            'debts' => Debt::whereBetween('date', [$startDate, $endDate]),
+            'expenses' => Expense::whereBetween('date', [$startDate, $endDate])
+        ][$tableToShow];
 
-        $todayDeviceIncome = 0;
-        $monthlyDeviceIncome = 0;
+        $items = $itemsQuery->paginate(10);
+        $items->appends($request->except('page'));
 
-        $todayBarIncome = 0;
-        $monthlyBarIncome = 0;
-
-
-        $monthlySessionsList = [];
-        $monthlyDebtsList = [];
-        $monthlyExpensesList = [];
-
-        $yearlySessionsList = [];
-        $yearlyDebtsList = [];
-        $yearlyExpensesList = [];
-        //calculate today income by date only
-
-        //remove duplicate date in allSessions
-        $allSessions1 = $allSessions1->unique('date');
-
-        foreach ($allSessions1 as $session) {
-            $formattedDate = Carbon::parse($session->date);
-            if ($formattedDate->isToday()) {
-                $todayIncome += $session->cost_after_promo;
-                $todayDeviceIncome += ($session->cost_after_promo - $session->bar_cost);
-
-
-                //add session to today sessions list
-                $todaySessionsList[] = $session;
-            }
-            if ($formattedDate->isCurrentMonth()) {
-                $monthlyIncome += $session->cost_after_promo;
-                $monthlyDeviceIncome += ($session->cost_after_promo - $session->bar_cost);
-                #todo:fix this
-              //  $monthlyBarIncome += $session->bar_cost;
-                //add session to monthly sessions list
-                $monthlySessionsList[] = $session;
-            }
-            if ($formattedDate->isCurrentYear()) {
-                //add session to yearly sessions list
-                $yearlySessionsList[] = $session;
-            }
-        }
-        foreach ($allSessions2 as $session) {
-            $formattedDate = Carbon::parse($session->date);
-            if ($formattedDate->isToday()) {
-                $todayBarIncome += $session->bar_cost;
-            }
-            if ($formattedDate->isCurrentMonth()) {
-                $monthlyBarIncome += $session->bar_cost;
-            }
-
-        }
-        //calculate today debt by date only
-        foreach ($allDebts as $debt) {
-            $formattedDate = Carbon::parse($debt->date);
-            if ($formattedDate->isToday()) {
-                $todaydebt += $debt->amount;
-                //add debt to today debts list
-                $todayDebts[] = $debt;
-            }
-            if ($formattedDate->isCurrentMonth()) {
-                $monthlydebt += $debt->amount;
-                //add debt to monthly debts list
-                $monthlyDebtsList[] = $debt;
-            }
-            if ($formattedDate->isCurrentYear()) {
-                //add debt to yearly debts list
-                $yearlyDebtsList[] = $debt;
-            }
-        }
-
-        //calculate today expense by date only
-        foreach ($allExpenses as $expense) {
-            $formattedDate = Carbon::parse($expense->date);
-            if ($formattedDate->isToday()) {
-                $todayExpense += $expense->amount;
-                //add expense to today expenses list
-                $todayExpenses[] = $expense;
-            }
-            if ($formattedDate->isCurrentMonth()) {
-                $monthlyExpense += $expense->amount;
-                //add expense to monthly expenses list
-                $monthlyExpensesList[] = $expense;
-            }
-            if ($formattedDate->isCurrentYear()) {
-                //add expense to yearly expenses list
-                $yearlyExpensesList[] = $expense;
-            }
-        }
-
-
-        //calculate today net income by date only
-        $todayNetIncomeDevice = $todayIncome - $todaydebt - $todayExpense- $todayBarIncome;
-        $todayNetIncome = $todayIncome - $todaydebt - $todayExpense;
-        $monthlyNetIncome = $monthlyIncome - $monthlydebt - $monthlyExpense;
-        $monthlyNetIncomeDevice = $monthlyIncome - $monthlydebt - $monthlyExpense;
-
-
-        return view('income', compact('allSessions1','allSessions2','todayNetIncome','monthlyNetIncomeDevice', 'todayIncome', 'monthlyIncome', 'todayDeviceIncome', 'monthlyDeviceIncome','todayDeviceIncome', 'todayBarIncome', 'monthlyBarIncome', 'todayNetIncomeDevice', 'monthlyNetIncome', 'todaydebt', 'monthlydebt', 'todayExpense', 'monthlyExpense', 'yearlySessionsList', 'yearlyDebtsList', 'yearlyExpensesList', 'monthlySessionsList', 'monthlyDebtsList', 'monthlyExpensesList'));
+        return view('income', compact(
+            'items',
+            'tableToShow',
+            'totalPlayingCost',
+            'totalBarCost',
+            'totalDebts',
+            'totalExpenses',
+            'totalNetIncome'
+        ));
     }
-
     /**
      * Show the form for editing the specified resource.
      */

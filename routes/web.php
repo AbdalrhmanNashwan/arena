@@ -38,6 +38,9 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::get('/sessions', [GsessionsController::class, 'allSessions'])->name('sessions');
     Route::get('/settings', [Settings::class, 'show'])->name('settings');
     Route::get('/income', [incomeController::class, 'show'])->name('income');
+
+    Route::get('/income-schedule', [incomeController::class, 'show'])->name('income.schedule');
+
     //debts routes
     Route::patch('/debts/{debt}/update-paid-status', [DebtController::class, 'updatePaidStatus'])->name('debt.updatePaidStatus');
     Route::delete('/debts/{debt}', [DebtController::class, 'destroy'])->name('debt.destroy');
